@@ -371,63 +371,7 @@ namespace Avalonia.Controls.UnitTests
             return UnitTestApplication.Start(services);
         }
 
-        private FuncControlTemplate ListBoxTemplate()
-        {
-            return new FuncControlTemplate<ListBox>((parent, scope) =>
-                new ScrollViewer
-                {
-                    Name = "PART_ScrollViewer",
-                    Template = ScrollViewerTemplate(),
-                    Content = new ItemsPresenter
-                    {
-                        Name = "PART_ItemsPresenter",
-                        HorizontalCacheLength = 0,
-                        VerticalCacheLength = 0,
-                        [~ItemsPresenter.ItemsProperty] = parent.GetObservable(ItemsControl.ItemsProperty).ToBinding(),
-                        [~ItemsPresenter.LayoutProperty] = parent.GetObservable(ItemsControl.LayoutProperty).ToBinding(),
-                    }.RegisterInNameScope(scope)
-                }.RegisterInNameScope(scope));
-        }
-
-        private FuncControlTemplate ListBoxItemTemplate()
-        {
-            return new FuncControlTemplate<ListBoxItem>((parent, scope) =>
-                new ContentPresenter
-                {
-                    Name = "PART_ContentPresenter",
-                    [!ContentPresenter.ContentProperty] = parent[!ListBoxItem.ContentProperty],
-                    [!ContentPresenter.ContentTemplateProperty] = parent[!ListBoxItem.ContentTemplateProperty],
-                }.RegisterInNameScope(scope));
-        }
-
-        private FuncControlTemplate ScrollViewerTemplate()
-        {
-            return new FuncControlTemplate<ScrollViewer>((parent, scope) =>
-                new Panel
-                {
-                    Children =
-                    {
-                        new ScrollContentPresenter
-                        {
-                            Name = "PART_ContentPresenter",
-                            [~ScrollContentPresenter.CanHorizontallyScrollProperty] = parent.GetObservable(ScrollViewer.CanHorizontallyScrollProperty).ToBinding(),
-                            [~ScrollContentPresenter.CanVerticallyScrollProperty] = parent.GetObservable(ScrollViewer.CanVerticallyScrollProperty).ToBinding(),
-                            [~ScrollContentPresenter.ContentProperty] = parent.GetObservable(ScrollViewer.ContentProperty).ToBinding(),
-                            [~~ScrollContentPresenter.ExtentProperty] = parent[~~ScrollViewer.ExtentProperty],
-                            [~~ScrollContentPresenter.OffsetProperty] = parent[~~ScrollViewer.OffsetProperty],
-                            [~~ScrollContentPresenter.ViewportProperty] = parent[~~ScrollViewer.ViewportProperty],
-                        }.RegisterInNameScope(scope),
-                        new ScrollBar
-                        {
-                            Name = "verticalScrollBar",
-                            [~ScrollBar.MaximumProperty] = parent[~ScrollViewer.VerticalScrollBarMaximumProperty],
-                            [~~ScrollBar.ValueProperty] = parent[~~ScrollViewer.VerticalScrollBarValueProperty],
-                        }
-                    }
-                });
-        }
-
-        private void Prepare(ListBox target)
+        private static void Prepare(ListBox target)
         {
             var root = new TestRoot
             {
@@ -460,6 +404,62 @@ namespace Avalonia.Controls.UnitTests
         {
             var root = (TestRoot)target.GetVisualRoot();
             root.LayoutManager.ExecuteLayoutPass();
+        }
+
+        private static FuncControlTemplate ListBoxTemplate()
+        {
+            return new FuncControlTemplate<ListBox>((parent, scope) =>
+                new ScrollViewer
+                {
+                    Name = "PART_ScrollViewer",
+                    Template = ScrollViewerTemplate(),
+                    Content = new ItemsPresenter
+                    {
+                        Name = "PART_ItemsPresenter",
+                        HorizontalCacheLength = 0,
+                        VerticalCacheLength = 0,
+                        [~ItemsPresenter.ItemsProperty] = parent.GetObservable(ItemsControl.ItemsProperty).ToBinding(),
+                        [~ItemsPresenter.LayoutProperty] = parent.GetObservable(ItemsControl.LayoutProperty).ToBinding(),
+                    }.RegisterInNameScope(scope)
+                }.RegisterInNameScope(scope));
+        }
+
+        private static FuncControlTemplate ListBoxItemTemplate()
+        {
+            return new FuncControlTemplate<ListBoxItem>((parent, scope) =>
+                new ContentPresenter
+                {
+                    Name = "PART_ContentPresenter",
+                    [!ContentPresenter.ContentProperty] = parent[!ListBoxItem.ContentProperty],
+                    [!ContentPresenter.ContentTemplateProperty] = parent[!ListBoxItem.ContentTemplateProperty],
+                }.RegisterInNameScope(scope));
+        }
+
+        private static FuncControlTemplate ScrollViewerTemplate()
+        {
+            return new FuncControlTemplate<ScrollViewer>((parent, scope) =>
+                new Panel
+                {
+                    Children =
+                    {
+                        new ScrollContentPresenter
+                        {
+                            Name = "PART_ContentPresenter",
+                            [~ScrollContentPresenter.CanHorizontallyScrollProperty] = parent.GetObservable(ScrollViewer.CanHorizontallyScrollProperty).ToBinding(),
+                            [~ScrollContentPresenter.CanVerticallyScrollProperty] = parent.GetObservable(ScrollViewer.CanVerticallyScrollProperty).ToBinding(),
+                            [~ScrollContentPresenter.ContentProperty] = parent.GetObservable(ScrollViewer.ContentProperty).ToBinding(),
+                            [~~ScrollContentPresenter.ExtentProperty] = parent[~~ScrollViewer.ExtentProperty],
+                            [~~ScrollContentPresenter.OffsetProperty] = parent[~~ScrollViewer.OffsetProperty],
+                            [~~ScrollContentPresenter.ViewportProperty] = parent[~~ScrollViewer.ViewportProperty],
+                        }.RegisterInNameScope(scope),
+                        new ScrollBar
+                        {
+                            Name = "verticalScrollBar",
+                            [~ScrollBar.MaximumProperty] = parent[~ScrollViewer.VerticalScrollBarMaximumProperty],
+                            [~~ScrollBar.ValueProperty] = parent[~~ScrollViewer.VerticalScrollBarValueProperty],
+                        }
+                    }
+                });
         }
 
         private class Item
