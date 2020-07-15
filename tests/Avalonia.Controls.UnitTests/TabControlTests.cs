@@ -255,7 +255,7 @@ namespace Avalonia.Controls.UnitTests
 
             ApplyTemplate(target);
 
-            var logicalChildren = target.ItemsPresenterPart.Panel.GetLogicalChildren();
+            var logicalChildren = target.Presenter.RealizedElements;
 
             var result = logicalChildren
                 .OfType<TabItem>()

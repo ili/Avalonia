@@ -62,9 +62,8 @@
                 <ScrollViewer>
                   <ItemsPresenter Name="PART_ItemsPresenter"
                                   Items="{TemplateBinding Items}"
-                                  ItemsPanel="{TemplateBinding ItemsPanel}"
                                   ItemTemplate="{TemplateBinding ItemTemplate}"
-                                  VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                  Layout="{TemplateBinding Layout}"/>
                 </ScrollViewer>
               </Border>
             </Popup>

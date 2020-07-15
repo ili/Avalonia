@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
+#nullable enable
+
 namespace Avalonia.Controls
 {
     /// <summary>
@@ -21,10 +23,10 @@ namespace Avalonia.Controls
     /// view of the Items. That way, each component does not need to know if the source is an
     /// IEnumerable, an IList, or something else.
     /// </remarks>
-    public class ItemsSourceView : INotifyCollectionChanged, IDisposable
+    public class ItemsSourceView : INotifyCollectionChanged, IDisposable, IReadOnlyList<object>
     {
         private readonly IList _inner;
-        private INotifyCollectionChanged _notifyCollectionChanged;
+        private INotifyCollectionChanged? _notifyCollectionChanged;
         private int _cachedSize = -1;
 
         /// <summary>
@@ -33,7 +35,7 @@ namespace Avalonia.Controls
         /// <param name="source">The data source.</param>
         public ItemsSourceView(IEnumerable source)
         {
-            Contract.Requires<ArgumentNullException>(source != null);
+            source = source ?? throw new ArgumentNullException(nameof(source));
 
             if (source is IList list)
             {
@@ -76,9 +78,16 @@ namespace Avalonia.Controls
         public bool HasKeyIndexMapping => false;
 
         /// <summary>
+        /// Retrieves the item at the specified index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The item.</returns>
+        public object this[int index] => GetAt(index);
+
+        /// <summary>
         /// Occurs when the collection has changed to indicate the reason for the change and which items changed.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         /// <inheritdoc/>
         public void Dispose()
@@ -93,7 +102,7 @@ namespace Avalonia.Controls
         /// Retrieves the item at the specified index.
         /// </summary>
         /// <param name="index">The index.</param>
-        /// <returns>the item.</returns>
+        /// <returns>The item.</returns>
         public object GetAt(int index) => _inner[index];
 
         public int IndexOf(object item) => _inner.IndexOf(item);
@@ -124,6 +133,10 @@ namespace Avalonia.Controls
             throw new NotImplementedException();
         }
 
+        public Enumerator GetEnumerator() => new Enumerator(_inner);
+        IEnumerator IEnumerable.GetEnumerator() => _inner.GetEnumerator();
+        IEnumerator<object> IEnumerable<object>.GetEnumerator() => GetEnumerator();
+
         protected void OnItemsSourceChanged(NotifyCollectionChangedEventArgs args)
         {
             _cachedSize = _inner.Count;
@@ -142,6 +155,17 @@ namespace Avalonia.Controls
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             OnItemsSourceChanged(e);
+        }
+
+        public struct Enumerator : IEnumerator<object>
+        {
+            private IEnumerator _innerEnumerator;
+            public Enumerator(IList inner) => _innerEnumerator = inner.GetEnumerator();
+            public object Current => _innerEnumerator.Current;
+            object IEnumerator.Current => Current;
+            public void Dispose() => (_innerEnumerator as IDisposable)?.Dispose();
+            public bool MoveNext() => _innerEnumerator.MoveNext();
+            void IEnumerator.Reset() => _innerEnumerator.Reset();
         }
     }
 }

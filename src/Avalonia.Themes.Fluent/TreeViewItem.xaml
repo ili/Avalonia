@@ -94,7 +94,7 @@
           <ItemsPresenter Name="PART_ItemsPresenter"
                           IsVisible="{TemplateBinding IsExpanded}"
                           Items="{TemplateBinding Items}"
-                          ItemsPanel="{TemplateBinding ItemsPanel}" />
+                          Layout="{TemplateBinding Layout}" />
         </StackPanel>
       </ControlTemplate>
     </Setter>

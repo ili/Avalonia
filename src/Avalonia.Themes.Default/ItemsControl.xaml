@@ -7,7 +7,7 @@
               Padding="{TemplateBinding Padding}">
         <ItemsPresenter Name="PART_ItemsPresenter"
                         Items="{TemplateBinding Items}"
-                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                        Layout="{TemplateBinding Layout}"
                         ItemTemplate="{TemplateBinding ItemTemplate}"/>
       </Border>
     </ControlTemplate>

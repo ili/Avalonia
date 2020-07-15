@@ -62,7 +62,7 @@ namespace Avalonia.ReactiveUI.UnitTests
             view.List.ApplyTemplate();
             view.List.Presenter.ApplyTemplate();
 
-            var child = view.List.Presenter.Panel.Children[0];
+            var child = view.List.Presenter.RealizedElements.First();
             var container = (ContentPresenter) child;
             container.UpdateChild();
 
@@ -80,7 +80,7 @@ namespace Avalonia.ReactiveUI.UnitTests
             view.List.ApplyTemplate();
             view.List.Presenter.ApplyTemplate();
 
-            var child = view.List.Presenter.Panel.Children[0];
+            var child = view.List.Presenter.RealizedElements.First();
             var container = (ContentPresenter) child;
             container.UpdateChild();
 

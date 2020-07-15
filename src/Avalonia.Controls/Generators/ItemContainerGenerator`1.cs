@@ -17,7 +17,7 @@ namespace Avalonia.Controls.Generators
         /// <param name="contentProperty">The container's Content property.</param>
         /// <param name="contentTemplateProperty">The container's ContentTemplate property.</param>
         public ItemContainerGenerator(
-            IControl owner, 
+            ItemsControl owner,
             AvaloniaProperty contentProperty,
             AvaloniaProperty contentTemplateProperty)
             : base(owner)
@@ -29,9 +29,6 @@ namespace Avalonia.Controls.Generators
             ContentTemplateProperty = contentTemplateProperty;
         }
 
-        /// <inheritdoc/>
-        public override Type ContainerType => typeof(T);
-
         /// <summary>
         /// Gets the container's Content property.
         /// </summary>
@@ -42,60 +39,26 @@ namespace Avalonia.Controls.Generators
         /// </summary>
         protected AvaloniaProperty ContentTemplateProperty { get; }
 
-        /// <inheritdoc/>
-        protected override IControl CreateContainer(object item)
+        protected override IControl CreateContainer(ElementFactoryGetArgs args)
         {
-            var container = item as T;
-
-            if (item == null)
+            if (args.Data is T t)
             {
-                return null;
-            }
-            else if (container != null)
-            {
-                return container;
-            }
-            else
-            {
-                var result = new T();
-
-                if (ContentTemplateProperty != null)
-                {
-                    result.SetValue(ContentTemplateProperty, ItemTemplate, BindingPriority.Style);
-                }
-
-                result.SetValue(ContentProperty, item, BindingPriority.Style);
-
-                if (!(item is IControl))
-                {
-                    result.DataContext = item;
-                }
-
-                return result;
-            }
-        }
-
-        /// <inheritdoc/>
-        public override bool TryRecycle(int oldIndex, int newIndex, object item)
-        {
-            var container = ContainerFromIndex(oldIndex);
-
-            if (container == null)
-            {
-                throw new IndexOutOfRangeException("Could not recycle container: not materialized.");
+                return t;
             }
 
-            container.SetValue(ContentProperty, item);
+            var result = new T();
 
-            if (!(item is IControl))
+            if (ContentTemplateProperty is object && Owner.ItemTemplate is object)
             {
-                container.DataContext = item;
+                result.SetValue(ContentTemplateProperty, Owner.ItemTemplate, BindingPriority.Style);
             }
 
-            var info = MoveContainer(oldIndex, newIndex, item);
-            RaiseRecycled(new ItemContainerEventArgs(info));
+            result.Bind(
+                ContentProperty,
+                result.GetBindingObservable(Control.DataContextProperty),
+                BindingPriority.Style);
 
-            return true;
+            return result;
         }
     }
 }

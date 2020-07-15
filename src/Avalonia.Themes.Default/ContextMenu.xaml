@@ -13,7 +13,7 @@
           <ScrollViewer Classes="menuscroller">
               <ItemsPresenter Name="PART_ItemsPresenter"
                               Items="{TemplateBinding Items}"
-                              ItemsPanel="{TemplateBinding ItemsPanel}"
+                              Layout="{TemplateBinding Layout}"
                               ItemTemplate="{TemplateBinding ItemTemplate}"
                               KeyboardNavigation.TabNavigation="Continue"/>
           </ScrollViewer>

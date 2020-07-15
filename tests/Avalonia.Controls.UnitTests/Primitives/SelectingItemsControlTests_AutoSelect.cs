@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
@@ -115,7 +116,7 @@ namespace Avalonia.Controls.UnitTests.Primitives
 
             Assert.Equal(0, target.SelectedIndex);
             Assert.Equal("bar", target.SelectedItem);
-            Assert.Equal(new[] { ":selected" }, target.Presenter.Panel.Children[0].Classes);
+            Assert.Equal(new[] { ":selected" }, target.Presenter.RealizedElements.First().Classes);
         }
 
         private FuncControlTemplate Template()
@@ -125,7 +126,7 @@ namespace Avalonia.Controls.UnitTests.Primitives
                 {
                     Name = "itemsPresenter",
                     [~ItemsPresenter.ItemsProperty] = control[~ItemsControl.ItemsProperty],
-                    [~ItemsPresenter.ItemsPanelProperty] = control[~ItemsControl.ItemsPanelProperty],
+                    [~ItemsPresenter.LayoutProperty] = control[~ItemsControl.LayoutProperty],
                 }.RegisterInNameScope(scope));
         }
 
