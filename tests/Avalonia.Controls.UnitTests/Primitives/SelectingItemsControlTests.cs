@@ -22,7 +22,7 @@ using Xunit;
 
 namespace Avalonia.Controls.UnitTests.Primitives
 {
-    public class SelectingItemsControlTests
+    public partial class SelectingItemsControlTests
     {
         private MouseTestHelper _helper = new MouseTestHelper();
 
@@ -1356,15 +1356,40 @@ namespace Avalonia.Controls.UnitTests.Primitives
 
         private class TestSelector : SelectingItemsControl
         {
+            public static readonly new AvaloniaProperty<IList> SelectedItemsProperty =
+                SelectingItemsControl.SelectedItemsProperty;
+
             public TestSelector()
             {
-                
             }
 
             public TestSelector(SelectionMode selectionMode)
             {
                 SelectionMode = selectionMode;
             }
+
+            public new IList SelectedItems
+            {
+                get { return base.SelectedItems; }
+                set { base.SelectedItems = value; }
+            }
+
+            public new ISelectionModel Selection
+            {
+                get => base.Selection;
+                set => base.Selection = value;
+            }
+
+            public new SelectionMode SelectionMode
+            {
+                get { return base.SelectionMode; }
+                set { base.SelectionMode = value; }
+            }
+
+            public void SelectAll() => Selection.SelectAll();
+            public void UnselectAll() => Selection.ClearSelection();
+            public void SelectRange(int index) => UpdateSelection(index, true, true);
+            public void Toggle(int index) => UpdateSelection(index, true, false, true);
 
             public new bool MoveSelection(NavigationDirection direction, bool wrap)
             {
