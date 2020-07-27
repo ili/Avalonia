@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Avalonia.Controls;
 using Avalonia.Controls.Platform.Surfaces;
 using Avalonia.Input;
 using Avalonia.Input.Raw;
@@ -18,7 +19,7 @@ namespace Avalonia.iOS
     {
         private readonly KeyboardEventsHelper<TopLevelImpl> _keyboardHelper;
 
-        private IInputRoot _inputRoot;
+        public IInputRoot InputRoot { get; private set; }
 
         public TopLevelImpl()
         {
@@ -39,7 +40,7 @@ namespace Avalonia.iOS
         public void DeleteBackward() => _keyboardHelper.DeleteBackward();
 
         public override bool CanBecomeFirstResponder => _keyboardHelper.CanBecomeFirstResponder();
-        
+
         public Action Closed { get; set; }
         public Action<RawInputEventArgs> Input { get; set; }
         public Action<Rect> Paint { get; set; }
@@ -50,7 +51,7 @@ namespace Avalonia.iOS
 
         public double RenderScaling => UIScreen.MainScreen.Scale;
 
-       
+
         public override void LayoutSubviews() => Resized?.Invoke(ClientSize);
 
         public Size ClientSize => Bounds.Size.ToAvalonia();
@@ -69,7 +70,7 @@ namespace Avalonia.iOS
 
         public void Invalidate(Rect rect) => SetNeedsDisplay();
 
-        public void SetInputRoot(IInputRoot inputRoot) => _inputRoot = inputRoot;
+        public void SetInputRoot(IInputRoot inputRoot) => InputRoot = inputRoot;
 
         public Point PointToClient(PixelPoint point) => point.ToPoint(1);
 
@@ -81,7 +82,7 @@ namespace Avalonia.iOS
         }
 
         public IEnumerable<object> Surfaces { get; }
-        
+
         public override void TouchesEnded(NSSet touches, UIEvent evt)
         {
             var touch = touches.AnyObject as UITouch;
@@ -92,7 +93,7 @@ namespace Avalonia.iOS
                 Input?.Invoke(new RawPointerEventArgs(
                     iOSPlatform.MouseDevice,
                     (uint)touch.Timestamp,
-                    _inputRoot,
+                    InputRoot,
                     RawPointerEventType.LeftButtonUp,
                     location,
                     RawInputModifiers.None));
@@ -107,10 +108,10 @@ namespace Avalonia.iOS
             {
                 var location = touch.LocationInView(this).ToAvalonia();
                 _touchLastPoint = location;
-                Input?.Invoke(new RawPointerEventArgs(iOSPlatform.MouseDevice, (uint)touch.Timestamp, _inputRoot,
+                Input?.Invoke(new RawPointerEventArgs(iOSPlatform.MouseDevice, (uint)touch.Timestamp, InputRoot,
                     RawPointerEventType.Move, location, RawInputModifiers.None));
 
-                Input?.Invoke(new RawPointerEventArgs(iOSPlatform.MouseDevice, (uint)touch.Timestamp, _inputRoot,
+                Input?.Invoke(new RawPointerEventArgs(iOSPlatform.MouseDevice, (uint)touch.Timestamp, InputRoot,
                     RawPointerEventType.LeftButtonDown, location, RawInputModifiers.None));
             }
         }
@@ -122,7 +123,7 @@ namespace Avalonia.iOS
             {
                 var location = touch.LocationInView(this).ToAvalonia();
                 if (iOSPlatform.MouseDevice.Captured != null)
-                    Input?.Invoke(new RawPointerEventArgs(iOSPlatform.MouseDevice, (uint)touch.Timestamp, _inputRoot,
+                    Input?.Invoke(new RawPointerEventArgs(iOSPlatform.MouseDevice, (uint)touch.Timestamp, InputRoot,
                         RawPointerEventType.Move, location, RawInputModifiers.LeftMouseButton));
                 else
                 {
@@ -130,16 +131,25 @@ namespace Avalonia.iOS
                     double correction = 0.02;
 
                     Input?.Invoke(new RawMouseWheelEventArgs(iOSPlatform.MouseDevice, (uint)touch.Timestamp,
-                        _inputRoot, location, (location - _touchLastPoint) * correction, RawInputModifiers.LeftMouseButton));
+                        InputRoot, location, (location - _touchLastPoint) * correction, RawInputModifiers.LeftMouseButton));
                 }
                 _touchLastPoint = location;
             }
         }
-        
+
         public ILockedFramebuffer Lock() => new EmulatedFramebuffer(this);
 
         public IPopupImpl CreatePopup() => null;
-        
+
+        public void SetTransparencyLevelHint(WindowTransparencyLevel transparencyLevel)
+        {
+        }
+
         public Action LostFocus { get; set; }
+        public Action<WindowTransparencyLevel> TransparencyLevelChanged { get; set; }
+
+        public WindowTransparencyLevel TransparencyLevel => WindowTransparencyLevel.None;
+
+        public AcrylicPlatformCompensationLevels AcrylicCompensationLevels { get; } = new AcrylicPlatformCompensationLevels(1, 1, 1);
     }
 }

@@ -70,13 +70,13 @@ namespace Avalonia.iOS.Specific
 
         public void InsertText(string text)
         {
-            var rawTextEvent = new RawTextInputEventArgs(KeyboardDevice.Instance, (uint)DateTime.Now.Ticks, text);
+            var rawTextEvent = new RawTextInputEventArgs(KeyboardDevice.Instance, (uint)DateTime.Now.Ticks, _view.InputRoot, text);
             _view.Input(rawTextEvent);
         }
 
         private void HandleKey(Key key, RawKeyEventType type)
         {
-            var rawKeyEvent = new RawKeyEventArgs(KeyboardDevice.Instance, (uint)DateTime.Now.Ticks, type, key, RawInputModifiers.None);
+            var rawKeyEvent = new RawKeyEventArgs(KeyboardDevice.Instance, (uint)DateTime.Now.Ticks, _view.InputRoot, type, key, RawInputModifiers.None);
             _view.Input(rawKeyEvent);
         }
 
